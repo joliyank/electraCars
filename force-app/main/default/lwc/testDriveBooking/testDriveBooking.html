@@ -1,0 +1,50 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 04-15-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <div class="container">
+        <div class="hero">
+            <div class="text-section">
+                <span class="tag">TEST DRIVE</span>
+                <h1>Ready to Get Behind <br/> <span>the Wheel?</span></h1>
+                <p>Experience the thrill. Feel the performance.<br/>Book your test drive in seconds.</p>
+            </div>
+
+            <div class="car-section">
+                <img src={carImageUrl} alt="Car" />
+            </div>
+        </div>
+
+        <div class="cards">
+            <!-- AI Assistant -->
+            <div class="card blue">
+                <div class="icon">🤖</div>
+                <h2>Book with AI Assistant</h2>
+                <p>Chat with our smart assistant and book instantly.</p>
+                <button onclick={handleAI}>Start Chat</button>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="card green">
+                <div class="icon">💬</div>
+                <h2>Book via WhatsApp</h2>
+                <p>Scan QR or message us</p>
+                <img class="qr" src={qrCodeUrl} alt="QR" />
+                <div class="phone">{phoneNumber}</div>
+                <button onclick={handleWhatsApp}>Message Now</button>
+            </div>
+
+            <!-- Form -->
+            <div class="card purple">
+                <div class="icon">📋</div>
+                <h2>Book via Form</h2>
+                <p>Fill details and we’ll contact you.</p>
+                <button onclick={handleForm}>Fill Form</button>
+            </div>
+        </div>
+    </div>
+</template>

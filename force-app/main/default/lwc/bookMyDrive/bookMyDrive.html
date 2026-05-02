@@ -1,0 +1,448 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 04-26-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <div class="bmd-shell">
+        <div class="bmd-container bmd-stage">
+            <!-- HERO -->
+            <div class="bmd-hero">
+                <div class="bmd-hero-left">
+                    <div class="bmd-badge">
+                        <span class="bmd-badge-dot"></span>
+                        <span class="bmd-badge-text">BookMyDrive</span>
+                    </div>
+
+                    <h1 class="bmd-title">
+                        Ready to Get Behind<br />
+                        <span class="bmd-title-accent">the Wheel?</span>
+                    </h1>
+
+                    <p class="bmd-subtitle">
+                        Experience the thrill. Feel the performance.<br />
+                        Book your test drive in just a few clicks.
+                    </p>
+                </div>
+
+                <div class="bmd-hero-right">
+                    <!-- Carousel -->
+                    <div class="bmd-slider" onmouseenter={pauseCarousel} onmouseleave={resumeCarousel}>
+                        <div class="bmd-slides" style={slidesStyle}>
+                            <template for:each={loopCars} for:item="car" for:index="idx">
+                                <div key={car.key} class="bmd-slide">
+                                    <img class="bmd-slideImg" src={car.img} alt={car.name} />
+
+                                    <div class="bmd-slideOverlay">
+                                        <div class="bmd-slideTitle">{car.name}</div>
+                                        <button class="bmd-slideCta" data-id={car.id} onclick={handleBookFromCar}>
+                                            Book Test Drive
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Dots -->
+                        <div class="bmd-dots" role="tablist" aria-label="Car selector">
+                            <template for:each={carsWithDots} for:item="car" for:index="idx">
+                                <button
+                                    key={car.id}
+                                    class={car.dotClass}
+                                    data-index={idx}
+                                    onclick={handleDotClick}
+                                    aria-label={car.dotAriaLabel}>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS -->
+            <div class="bmd-cards">
+                <!-- AI -->
+                <div class="bmd-card bmd-blue">
+                    <div class="bmd-cardHead">
+                        <!-- <div class="bmd-iconWrap bmd-iconBlue">🤖</div> -->
+                        <div class="bmd-iconWrap bmd-iconBlue">
+                            <img class="bmd-headIcon" src={aiIconStatic} alt="AI" />
+                        </div>
+                        <div>
+                            <div class="bmd-cardTitle">Book with AI Assistant</div>
+                            <p class="bmd-cardDesc">Chat with our smart assistant and book in seconds.</p>
+                        </div>
+                    </div>
+                    <div class="bmd-cardFoot">
+                        <button class="bmd-btn bmd-btnBlue" onclick={handleStartChat}>
+                            Start Chat <span class="bmd-btnArrow">›</span>
+                        </button>
+                    </div>
+                    <div class="bmd-cardBody">
+                        <div class="bmd-pill bmd-pillBlue">⚡ Fastest &amp; Smartest Way to Book</div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp -->
+                <div class="bmd-card bmd-green">
+                    <div class="bmd-cardHead">
+                        <!-- <div class="bmd-iconWrap bmd-iconGreen">💬</div> -->
+                        <div class="bmd-iconWrap bmd-iconGreen">
+                            <img class="bmd-headIcon" src={waIconStatic} alt="WhatsApp" />
+                        </div>
+                        <div>
+                            <div class="bmd-cardTitle">Book via WhatsApp</div>
+                            <p class="bmd-cardDesc">Scan QR code or message us to schedule your test drive.</p>
+                        </div>
+                    </div>
+
+                    <div class="bmd-cardBody bmd-qrArea">
+                        <button class="bmd-btn bmd-btnGreen" type="button" onclick={handleWhatsApp}>
+                            <span>Chat on WhatsApp</span>
+                            <span class="bmd-btnArrow" aria-hidden="true">›</span>
+                        </button>
+                        <!-- (4) Move heading ABOVE QR -->
+                        <div class="bmd-pill bmd-pillGreen">✅ Message us at {displayPhone}</div>
+
+                        <!-- QR (hover hint + click zoom) 
+                        <div class="bmd-qrFrame" role="button" tabindex="0" onclick={handleOpenQrZoom} onkeydown={handleQrFrameKeydown}>
+                            <img class="bmd-qr" src={qrSrc} alt="WhatsApp QR code" />
+                            <div class="bmd-qrHint">
+                                <span class="bmd-qrHintLabel">Zoom</span>
+                            </div>
+                        </div>-->
+
+                        <!-- <button class="bmd-btn bmd-btnGreen bmd-onlyMobile" onclick={handleWhatsApp}>
+                            Open WhatsApp <span class="bmd-btnArrow">›</span>
+                        </button> -->
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div class="bmd-card bmd-purple">
+                    <div class="bmd-cardHead">
+                        <!-- <div class="bmd-iconWrap bmd-iconPurple">📝</div> -->
+                        <div class="bmd-iconWrap bmd-iconPurple">
+                            <img class="bmd-headIcon" src={formIconStatic} alt="Form" />
+                        </div>
+                        <div>
+                            <div class="bmd-cardTitle">Book by Filling a Form</div>
+                            <p class="bmd-cardDesc">Tell us your preference of vehicle and we’ll get back to you.</p>
+                        </div>
+                    </div>
+                    <div class="bmd-cardFoot">
+                        <button class="bmd-btn bmd-btnPurple" onclick={handleForm}>
+                            Fill Booking Form <span class="bmd-btnArrow">›</span>
+                        </button>
+                    </div>
+                    <div class="bmd-cardBody">
+                        <div class="bmd-pill bmd-pillPurple">🕒 We’ll Contact You Soon</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Features -->
+            <div class="bmd-features">
+                <div class="bmd-feature">
+                    <img src={featureQuickIcon} class="bmd-featureIcon" alt="Quick" />
+                    <div>
+                        <div class="bmd-featureTitle">Quick &amp; Easy</div>
+                        <div class="bmd-featureSub">Book in minutes</div>
+                    </div>
+                </div>
+                <div class="bmd-feature">
+                    <img src={featureSlotIcon} class="bmd-featureIcon" alt="Slot" />
+                    <div>
+                        <div class="bmd-featureTitle">Choose Your Slot</div>
+                        <div class="bmd-featureSub">Pick date &amp; time</div>
+                    </div>
+                </div>
+                <div class="bmd-feature">
+                    <img src={featureNoObligationIcon} class="bmd-featureIcon" alt="No obligation" />
+                    <div>
+                        <div class="bmd-featureTitle">No Obligations</div>
+                        <div class="bmd-featureSub">Test drive at your pace</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Backdrop + Modal -->
+            <div class={backdropClass} onclick={handleBackdropClick}></div>
+
+            <div class={aiModalClass} style={aiModalStyle} onkeydown={handleAiKeydown}>
+                <div class="bmd-aiShell" role="dialog" aria-modal="true" aria-label="Book with AI Assistant">
+                    <div class="bmd-aiHeader">
+                        <div class="bmd-aiHeaderLeft">
+                            <div class="bmd-iconWrap bmd-iconBlue">
+                                <img class="bmd-headIcon" src={aiIconStatic} alt="AI" />
+                            </div>
+                            <span class="bmd-aiTitle">Book with AI Assistant</span>
+                        </div>
+                        <button class="bmd-aiClose" onclick={handleCloseAi} aria-label="Close">✕</button>
+                    </div>
+
+                    <div class="bmd-aiBody">
+                        <template for:each={messages} for:item="msg" for:index="index">
+                            <div key={msg.id} class={msg.rowClass}>
+                                <div class={msg.bubbleClass}>
+                                    {msg.text}
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="bmd-aiFooter">
+                        <input 
+                            class="bmd-aiInput" 
+                            type="text" 
+                            placeholder="Type your message..."
+                            value={currentMessage}
+                            oninput={handleMessageChange}
+                        />
+                        <button class="bmd-aiSend" onclick={handleSendMessage}>Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM Fill Modal Start-->
+            <section class={formModalClass} style={formModalStyle} onkeydown={handleFormKeydown} role="dialog" aria-modal="true">
+                <div class="bmd-formShell" onclick={stopPropagation}>
+                <!-- Header -->
+                <header class="bmd-formHeader">
+                    <div class="bmd-formHeaderLeft">
+                        <div>
+                            <div class="bmd-formTitle">Book Your Test Drive</div>
+                            <div class="bmd-formSubtitle">Tell us your details and we’ll get back to you shortly.</div>
+                        </div>
+                    </div>
+                    <!-- <button class="bmd-resetBtn" onclick={handleResetForm} title="Reset">↺</button> -->
+                    <button class="bmd-formClose" type="button" onclick={handleCloseForm} aria-label="Close">✕</button>
+                </header>
+            
+                <!-- Body -->
+                <div class="bmd-formBody">
+                    <div class="bmd-formCard">
+                    <div class="bmd-formGrid">
+                        <template if:false={isConfirmed}>
+                            <!-- ========== STEP 1: ZIP (Always visible) ========== -->
+                            <div class="bmd-field bmd-full">
+                            <label>Zip Code</label>
+                            <input
+                                class="bmd-input"
+                                inputmode="numeric"
+                                maxlength="6"
+                                placeholder="Enter 6 digit zip code"
+                                value={formData.zip}
+                                data-field="zip"
+                                oninput={handleInput}
+                            />
+
+                            <template if:true={isZipLoading}>
+                                <div class="spinner-wrapper">
+                                    <div class="loading_spinner"></div>
+                                </div>
+                            </template>
+                
+                            <!-- Zip Error -->
+                            <template if:true={zipErrorMsg}>
+                                <div class="bmd-inlineError">{zipErrorMsg}</div>
+                            </template>
+                
+                            <!-- Dealer Found -->
+                            <template if:true={dealerFound}>
+                                <div class="bmd-inlineSuccess">Dealer: {dealerName}</div>
+                            </template>
+                            </div>
+                
+                            <!-- ========== STEP 2: MOBILE (Visible only after Dealer Found) ========== -->
+                            <template if:true={showMobileStep}>
+                                <div class="bmd-field bmd-full">
+                                    <label>Mobile</label>
+                                    <input
+                                    class="bmd-input"
+                                    inputmode="numeric"
+                                    maxlength="10"
+                                    placeholder="Enter 10 digit mobile number"
+                                    value={formData.mobile}
+                                    data-field="mobile"
+                                    oninput={handleInput}
+                                    />
+                    
+                                    <template if:true={isMobileLoading}>
+                                        <div class="spinner-wrapper">
+                                            <div class="loading_spinner"></div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- Mobile Error / Manual entry hint -->
+                                    <template if:true={mobileErrorMsg}>
+                                        <div class="bmd-inlineError">{mobileErrorMsg}</div>
+                                    </template>
+                                    <template if:true={mobileInfoMsg}>
+                                        <div class="bmd-inlineInfo">{mobileInfoMsg}</div>
+                                    </template>
+                    
+                                    <!-- Customer Found -->
+                                    <!-- <template if:true={customerFound}>
+                                    <div class="bmd-inlineSuccess">
+                                        Hello: {customerName}, kindly fill below details:
+                                    </div>
+                                    </template> -->
+                                </div>
+                            </template>
+                
+                            <!-- ========== STEP 3: REST OF FORM (Visible after Mobile validation attempt) ========== -->
+                            <template if:true={showDetailsStep}>
+                
+                                <!-- Full Name -->
+                                <div class="bmd-field">
+                                    <label>Full Name</label>
+                                    <input
+                                    class="bmd-input"
+                                    type="text"
+                                    placeholder="Enter full name"
+                                    value={formData.name}
+                                    data-field="name"
+                                    oninput={handleInput}
+                                    readonly={nameEmailReadonly}
+                                    />
+                                </div>
+                    
+                                <!-- Email -->
+                                <div class="bmd-field">
+                                    <label>Email</label>
+                                    <input
+                                    class="bmd-input"
+                                    type="email"
+                                    placeholder="Enter email"
+                                    value={formData.email}
+                                    data-field="email"
+                                    oninput={handleInput}
+                                    readonly={nameEmailReadonly}
+                                    />
+                                </div>
+                    
+                                <!-- Car Model -->
+                                <div class="bmd-field">
+                                    <label>Car Model</label>
+                                    <select class="bmd-input" data-field="carModel" onchange={handleInput}>
+                                    <option value="">Select</option>
+                                    <option value="Nexon">Nexon</option>
+                                    <option value="Harrier">Harrier</option>
+                                    <option value="Safari">Safari</option>
+                                    <option value="Punch">Punch</option>
+                                    </select>
+                                </div>
+                    
+                                <!-- Fuel Type -->
+                                <div class="bmd-field">
+                                    <label>Fuel Type</label>
+                                    <select class="bmd-input" data-field="fuelType" onchange={handleInput}>
+                                    <option value="">Select</option>
+                                    <option value="Petrol">Petrol</option>
+                                    <option value="Diesel">Diesel</option>
+                                    <option value="Electric">Electric</option>
+                                    </select>
+                                </div>
+                    
+                                <!-- Test Drive Location -->
+                                <div class="bmd-field">
+                                    <label>Test Drive Location</label>
+                                    <select class="bmd-input" value={formData.locationType} onchange={handleLocationChange}>
+                                    <option value="SHOWROOM">Showroom</option>
+                                    <option value="DOOR">Door Step</option>
+                                    </select>
+                                </div>
+                    
+                                <!-- Date & Time -->
+                                <div class="bmd-field">
+                                    <label>Date &amp; Time</label>
+                                    <input
+                                    class="bmd-input"
+                                    type="datetime-local"
+                                    value={formData.datetime}
+                                    data-field="datetime"
+                                    onchange={handleInput}
+                                    />
+                                </div>
+                    
+                                <!-- Showroom Address (readonly) -->
+                                <template if:true={isShowroom}>
+                                    <div class="bmd-field bmd-full">
+                                    <label>Nearest Showroom</label>
+                                    <input class="bmd-input" type="text" value={nearestShowroom} readonly />
+                                    </div>
+                                </template>
+                    
+                                <!-- Doorstep Address (editable) -->
+                                <template if:true={isDoorstep}>
+                                    <div class="bmd-field bmd-full">
+                                    <label>Address</label>
+                                    <textarea
+                                        class="bmd-input"
+                                        placeholder="Enter doorstep address"
+                                        data-field="address"
+                                        oninput={handleInput}
+                                    >{formData.address}</textarea>
+                                    </div>
+                                </template>
+                    
+                                <!-- Preferred Communication -->
+                                <div class="bmd-field bmd-full">
+                                    <label>Preferred Communication Channel</label>
+                                    <select class="bmd-input" data-field="communication" onchange={handleInput}>
+                                    <option value="">Select</option>
+                                    <option value="WhatsApp">WhatsApp</option>
+                                    <option value="Call">Call</option>
+                                    <option value="Email">Email</option>
+                                    </select>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                        <!-- CONFIRMATION VIEW -->
+                        <template if:true={isConfirmed}>
+                            <div class="bmd-confirmation">
+                                <img src={confirmImage} alt="Confirmed" class="bmd-confirmImg"/>
+                                <div class="bmd-confirmText">
+                                    Your test drive is confirmed !!
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            
+                <!-- Footer -->
+                <template if:false={isConfirmed}>
+                    <template if:true={showDetailsStep}>
+                        <footer class="bmd-formFooter">
+                            <button class="bmd-btn bmd-btnPurple" type="button" onclick={handleSubmitForm} disabled={isSubmitDisabled}>
+                            Submit
+                            </button>
+                        </footer>
+                    </template>
+                </template>
+                </div>
+            </section>
+  
+            <!-- FORM Fill Modal End-->
+
+            <!-- QR Zoom Backdrop + Modal -->
+            <div class={qrBackdropClass} onclick={handleCloseQrZoom}></div>
+
+            <div class={qrModalClass} onkeydown={handleQrKeydown}>
+                <div class="bmd-qrZoomShell" role="dialog" aria-modal="true" aria-label="QR Code Zoom">
+                    <div class="bmd-qrZoomHeader">
+                        <div class="bmd-qrZoomTitle">WhatsApp QR Code</div>
+                        <button class="bmd-qrZoomClose" onclick={handleCloseQrZoom} aria-label="Close">✕</button>
+                    </div>
+                    <div class="bmd-qrZoomBody">
+                        <img class="bmd-qrZoomImg" src={qrSrc} alt="WhatsApp QR code zoom" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
