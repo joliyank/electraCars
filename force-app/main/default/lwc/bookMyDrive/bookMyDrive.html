@@ -2,8 +2,8 @@
   @description       : 
   @author            : ChangeMeIn@UserSettingsUnder.SFDoc
   @group             : 
-  @last modified on  : 04-26-2026
-  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+  @last modified on  : 02-05-2026
+  @last modified by  : Nand Kishor
 -->
 <template>
     <div class="bmd-shell">
@@ -13,7 +13,7 @@
                 <div class="bmd-hero-left">
                     <div class="bmd-badge">
                         <span class="bmd-badge-dot"></span>
-                        <span class="bmd-badge-text">BookMyDrive</span>
+                        <span class="bmd-badge-text">Electra Cars</span>
                     </div>
 
                     <h1 class="bmd-title">
@@ -37,9 +37,9 @@
 
                                     <div class="bmd-slideOverlay">
                                         <div class="bmd-slideTitle">{car.name}</div>
-                                        <button class="bmd-slideCta" data-id={car.id} onclick={handleBookFromCar}>
+                                        <!-- <button class="bmd-slideCta" data-id={car.id} onclick={handleBookFromCar}>
                                             Book Test Drive
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
                             </template>
@@ -63,25 +63,25 @@
 
             <!-- CARDS -->
             <div class="bmd-cards">
-                <!-- AI -->
-                <div class="bmd-card bmd-blue">
+                <!-- Form -->
+                <div class="bmd-card bmd-purple">
                     <div class="bmd-cardHead">
-                        <!-- <div class="bmd-iconWrap bmd-iconBlue">🤖</div> -->
-                        <div class="bmd-iconWrap bmd-iconBlue">
-                            <img class="bmd-headIcon" src={aiIconStatic} alt="AI" />
+                        <!-- <div class="bmd-iconWrap bmd-iconPurple">📝</div> -->
+                        <div class="bmd-iconWrap bmd-iconPurple">
+                            <img class="bmd-headIcon" src={formIconStatic} alt="Form" />
                         </div>
                         <div>
-                            <div class="bmd-cardTitle">Book with AI Assistant</div>
-                            <p class="bmd-cardDesc">Chat with our smart assistant and book in seconds.</p>
+                            <div class="bmd-cardTitle">Book by Filling a Form</div>
+                            <p class="bmd-cardDesc">Tell us your preference of vehicle and we’ll get back to you.</p>
                         </div>
                     </div>
                     <div class="bmd-cardFoot">
-                        <button class="bmd-btn bmd-btnBlue" onclick={handleStartChat}>
-                            Start Chat <span class="bmd-btnArrow">›</span>
+                        <button class="bmd-btn bmd-btnPurple" onclick={handleForm}>
+                            Fill Booking Form <span class="bmd-btnArrow">›</span>
                         </button>
                     </div>
                     <div class="bmd-cardBody">
-                        <div class="bmd-pill bmd-pillBlue">⚡ Fastest &amp; Smartest Way to Book</div>
+                        <div class="bmd-pill bmd-pillPurple">🕒 We’ll Contact You Soon</div>
                     </div>
                 </div>
 
@@ -120,25 +120,25 @@
                     </div>
                 </div>
 
-                <!-- Form -->
-                <div class="bmd-card bmd-purple">
+                <!-- AI -->
+                <div class="bmd-card bmd-blue">
                     <div class="bmd-cardHead">
-                        <!-- <div class="bmd-iconWrap bmd-iconPurple">📝</div> -->
-                        <div class="bmd-iconWrap bmd-iconPurple">
-                            <img class="bmd-headIcon" src={formIconStatic} alt="Form" />
+                        <!-- <div class="bmd-iconWrap bmd-iconBlue">🤖</div> -->
+                        <div class="bmd-iconWrap bmd-iconBlue">
+                            <img class="bmd-headIcon" src={aiIconStatic} alt="AI" />
                         </div>
                         <div>
-                            <div class="bmd-cardTitle">Book by Filling a Form</div>
-                            <p class="bmd-cardDesc">Tell us your preference of vehicle and we’ll get back to you.</p>
+                            <div class="bmd-cardTitle">Book with AI Assistant</div>
+                            <p class="bmd-cardDesc">Chat with our smart assistant and book in seconds.</p>
                         </div>
                     </div>
                     <div class="bmd-cardFoot">
-                        <button class="bmd-btn bmd-btnPurple" onclick={handleForm}>
-                            Fill Booking Form <span class="bmd-btnArrow">›</span>
+                        <button class="bmd-btn bmd-btnBlue" onclick={handleStartChat}>
+                            Start Chat <span class="bmd-btnArrow">›</span>
                         </button>
                     </div>
                     <div class="bmd-cardBody">
-                        <div class="bmd-pill bmd-pillPurple">🕒 We’ll Contact You Soon</div>
+                        <div class="bmd-pill bmd-pillBlue">⚡ Fastest &amp; Smartest Way to Book</div>
                     </div>
                 </div>
             </div>
@@ -328,22 +328,10 @@
                                 <div class="bmd-field">
                                     <label>Car Model</label>
                                     <select class="bmd-input" data-field="carModel" onchange={handleInput}>
-                                    <option value="">Select</option>
-                                    <option value="Nexon">Nexon</option>
-                                    <option value="Harrier">Harrier</option>
-                                    <option value="Safari">Safari</option>
-                                    <option value="Punch">Punch</option>
-                                    </select>
-                                </div>
-                    
-                                <!-- Fuel Type -->
-                                <div class="bmd-field">
-                                    <label>Fuel Type</label>
-                                    <select class="bmd-input" data-field="fuelType" onchange={handleInput}>
-                                    <option value="">Select</option>
-                                    <option value="Petrol">Petrol</option>
-                                    <option value="Diesel">Diesel</option>
-                                    <option value="Electric">Electric</option>
+                                        <option value="">Select</option>
+                                        <template for:each={avlVehicleList} for:item="veh">
+                                            <option key={veh} value={veh}>{veh}</option>
+                                        </template>
                                     </select>
                                 </div>
                     
@@ -395,8 +383,9 @@
                                     <select class="bmd-input" data-field="communication" onchange={handleInput}>
                                     <option value="">Select</option>
                                     <option value="WhatsApp">WhatsApp</option>
-                                    <option value="Call">Call</option>
+                                    <option value="Phone">Phone</option>
                                     <option value="Email">Email</option>
+                                    <option value="SMS">SMS</option>
                                     </select>
                                 </div>
                             </template>
@@ -407,7 +396,7 @@
                             <div class="bmd-confirmation">
                                 <img src={confirmImage} alt="Confirmed" class="bmd-confirmImg"/>
                                 <div class="bmd-confirmText">
-                                    Your test drive is confirmed !!
+                                    Your test drive is confirmed, <br> Booking no. {testDriveName}
                                 </div>
                             </div>
                         </template>
@@ -445,4 +434,47 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== Coachmark overlay (Start Chat guidance) ===== -->
+    <template if:true={isChatCoachmarkOpen}>
+        <section class="bmd-coachLayer" role="dialog" aria-label="Chat guidance" aria-modal="true">
+            <!-- Visual dim/blur (no click capture) -->
+            <div class="bmd-coachBackdrop"></div>
+
+            <!-- Click-catch panes (everything except the chat bubble area) -->
+            <div class="bmd-coachCatch bmd-coachCatch--top" onclick={hideChatCoachmark}></div>
+            <div class="bmd-coachCatch bmd-coachCatch--left" onclick={hideChatCoachmark}></div>
+            <div class="bmd-coachCatch bmd-coachCatch--right" onclick={hideChatCoachmark}></div>
+            <div class="bmd-coachCatch bmd-coachCatch--bottom" onclick={hideChatCoachmark}></div>
+
+            <!-- Spotlight ring around the bubble area -->
+            <div class="bmd-coachSpotlight" aria-hidden="true"></div>
+
+            <!-- Tooltip text -->
+            <div class="bmd-coachTooltip">
+                <!-- <div class="bmd-coachTitle">Start chatting with our AI Assistant</div>
+                <div class="bmd-coachSub">Tap the chat icon to open the conversation.</div> -->
+                <div class="bmd-coachTitle">Click here to chat with AI assistant</div>
+            </div>
+
+            <!-- Arrow (SVG) pointing to the bubble -->
+            <svg class="bmd-coachArrow" viewBox="0 0 260 140" aria-hidden="true">
+                <!-- Curved arrow line -->
+                <path
+                    d="M10 25 C 120 10, 150 120, 220 120"
+                    fill="none"
+                    stroke="#f6d57a"
+                    stroke-width="8"
+                    stroke-linecap="round">
+                </path>
+            
+                <!-- Arrow head (triangle) -->
+                <path
+                    d="M220 120 L240 110 L238 130 Z"
+                    fill="#f6d57a">
+                </path>
+            </svg>
+        </section>
+    </template>
+
 </template>

@@ -606,8 +606,8 @@
 
 .bmd-slideTitle {
   color: #fff;
-  font-weight: 900;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 30px;
 }
 
 .bmd-slideCta {
@@ -1114,4 +1114,170 @@
     font-size: 18px;
     font-weight: 800;
     color: #412376;
+}
+
+
+
+
+/* =========================================================
+Coachmark overlay for Embedded Messaging bubble guidance
+========================================================= */
+
+.bmd-coachLayer {
+  /* Tweak these 3 values if your bubble sits slightly different */
+  --bmd-hole-size: 96px;
+  --bmd-hole-right: 22px;
+  --bmd-hole-bottom: 22px;
+
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+}
+
+/* Dim + blur layer (visual only) */
+.bmd-coachBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 18, 30, 0.60);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+/* Click-catch panes: cover everything EXCEPT the bubble rectangle,
+   so the real embedded messaging bubble remains clickable */
+.bmd-coachCatch {
+  position: fixed;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Pane above bubble area */
+.bmd-coachCatch--top {
+  top: 0; left: 0; right: 0;
+  bottom: calc(var(--bmd-hole-bottom) + var(--bmd-hole-size));
+}
+
+/* Pane left of bubble area (same vertical band as bubble) */
+.bmd-coachCatch--left {
+  left: 0;
+  right: calc(var(--bmd-hole-right) + var(--bmd-hole-size));
+  bottom: var(--bmd-hole-bottom);
+  height: var(--bmd-hole-size);
+}
+
+/* Pane right edge (thin strip) */
+.bmd-coachCatch--right {
+  right: 0;
+  width: var(--bmd-hole-right);
+  bottom: var(--bmd-hole-bottom);
+  height: var(--bmd-hole-size);
+}
+
+/* Pane bottom strip */
+.bmd-coachCatch--bottom {
+  left: 0; right: 0; bottom: 0;
+  height: var(--bmd-hole-bottom);
+}
+
+/* Spotlight ring (draws attention to bubble area) */
+/* ===== Spotlight ring around chat button ===== */
+/* ===== Spotlight ring centered on chat bubble ===== */
+.bmd-coachSpotlight {
+  position: fixed;
+  width: 96px;
+  height: 96px;
+  right: calc(var(--bmd-hole-right));
+  bottom: calc(var(--bmd-hole-bottom));
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.92),
+    0 0 42px rgba(1,118,211,0.85);
+  pointer-events: none;
+  z-index: 9100;
+  animation: bmdSpotPulse 1.3s ease-in-out infinite;
+}
+
+
+@keyframes bmdSpotPulse {
+  0%   { transform: scale(1);   box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 0 26px rgba(246,213,122,0.55); }
+  50%  { transform: scale(1.07); box-shadow: 0 0 0 6px rgba(255,255,255,0.35), 0 0 38px rgba(246,213,122,0.85); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 0 26px rgba(246,213,122,0.55); }
+}
+
+/* Tooltip box */
+/* ===== Coach tooltip (AI blue) ===== */
+/* ===== Coachmark Tooltip (AI blue) ===== */
+.bmd-coachTooltip {
+  position: fixed;
+  right: calc(var(--bmd-hole-right) + var(--bmd-hole-size) + 16px);
+  bottom: calc(var(--bmd-hole-bottom) + 6px);
+  background: linear-gradient(135deg, #0176d3, #0b5cab);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 14px;
+  max-width: 260px;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.35);
+  pointer-events: none;
+  z-index: 9100;
+}
+
+.bmd-coachTitle {
+  font-weight: 900;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.bmd-coachSub {
+  font-weight: 700;
+  font-size: 13px;
+  opacity: 0.92;
+}
+
+/* Arrow */
+/* ===== Arrow pointing to chat bubble ===== */
+/* ===== Coachmark Arrow (AI branded, visible) ===== */
+.bmd-coachArrow {
+  position: fixed;
+  width: 320px;
+  height: 180px;
+  right: calc(var(--bmd-hole-right) + 56px);
+  bottom: calc(var(--bmd-hole-bottom) + 46px);
+  pointer-events: none;
+  z-index: 9200;
+  filter: drop-shadow(0 14px 22px rgba(1, 118, 211, 0.45));
+}
+
+.bmd-coachArrow path {
+  stroke: #0176d3;
+  stroke-width: 10;
+}
+
+.bmd-coachArrow path:last-child {
+  fill: #0176d3;
+}
+
+
+/* Mobile adjustments */
+@media (max-width: 680px) {
+  .bmd-coachLayer {
+    --bmd-hole-size: 86px;
+    --bmd-hole-right: 16px;
+    --bmd-hole-bottom: 16px;
+  }
+  
+  .bmd-coachArrow {
+    display: none;
+  }
+
+  .bmd-coachTooltip {
+    left: 16px;
+    right: 16px;
+    bottom: 140px;
+    max-width: none;
+    text-align: center;
+  }
+
 }

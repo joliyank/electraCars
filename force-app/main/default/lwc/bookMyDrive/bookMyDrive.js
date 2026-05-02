@@ -1,12 +1,15 @@
 import { LightningElement, api } from 'lwc';
 import DEFAULT_CAR from '@salesforce/resourceUrl/bmd_car2';
 import DEFAULT_QR from '@salesforce/resourceUrl/bmd_qr';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import CAR1 from '@salesforce/resourceUrl/bmd_car_top1';
 import CAR2 from '@salesforce/resourceUrl/bmd_car_top2';
 import CAR3 from '@salesforce/resourceUrl/bmd_car_top3';
 import CAR4 from '@salesforce/resourceUrl/bmd_car_top4';
 import CAR5 from '@salesforce/resourceUrl/bmd_car_top5';
+import CAR6 from '@salesforce/resourceUrl/bmd_car_top6';
+import CAR7 from '@salesforce/resourceUrl/bmd_car_top7';
 
 import AI_STATIC from '@salesforce/resourceUrl/bmd_icon_ai_static';
 import WA_STATIC from '@salesforce/resourceUrl/bmd_icon_whatsapp_static';
@@ -20,6 +23,7 @@ import CONFIRM_IMG from '@salesforce/resourceUrl/CONFIRM_IMG';
 
 import findDealerByZip from '@salesforce/apex/BookMyDriveController.findDealerByZip';
 import findCustomerByMobile from '@salesforce/apex/BookMyDriveController.findCustomerByMobile';
+import createBooking from '@salesforce/apex/BookMyDriveController.createBooking';
 
 export default class BookMyDrive extends LightningElement {
     @api carImageUrl;
@@ -45,14 +49,26 @@ export default class BookMyDrive extends LightningElement {
     activeIndex = 0;
     _timer = null;
     _wired = false;
+    
+    isChatReady = false;
+    _poller;
+    bookingRequest = [];
+
+    // carsBase = [
+    //     { id: '1', name: 'Sierra', img: CAR1 },
+    //     { id: '2', name: 'Harrier', img: CAR2 },
+    //     { id: '3', name: 'Punch', img: CAR5 },
+    //     { id: '4', name: 'Safari', img: CAR3 },
+    //     { id: '5', name: 'Nexon', img: CAR4 },
+    //     { id: '6', name: 'Safari', img: CAR6 },
+    //     { id: '7', name: 'Nexon', img: CAR7 }        
+    // ];
 
     carsBase = [
-        { id: '1', name: 'Sierra', img: CAR1 },
-        { id: '2', name: 'Harrier', img: CAR2 },
-        { id: '3', name: 'Punch', img: CAR5 }
-        // { id: '4', name: 'Safari', img: CAR3 },
-        // { id: '5', name: 'Nexon', img: CAR4 },
-        
+        { id: '1', name: 'Car X+', img: CAR3 },
+        { id: '2', name: 'Car YZ', img: CAR4 },
+        { id: '3', name: 'Car Z+', img: CAR6 },
+        { id: '4', name: 'Car ZX', img: CAR7 }       
     ];
 
     isFormOpen = false;
@@ -63,33 +79,20 @@ export default class BookMyDrive extends LightningElement {
         email: '',
         zip: '',
         carModel: '',
-        fuelType: '',
+        fuelType: 'Petrol',
         datetime: '',
         address: '',
         communication: '',
         locationType: 'SHOWROOM'
     };
 
-    
-    isFormOpen = false;
-    formData = {
-        name: '',
-        mobile: '',
-        email: '',
-        zip: '',
-        carModel: '',
-        fuelType: '',
-        datetime: '',
-        address: '',
-        communication: '',
-        locationType: 'SHOWROOM'
-    };
     // ===== Progressive form state =====
     dealerLookupInProgress = false;
     customerLookupInProgress = false;
 
     zipErrorMsg = '';
     dealerFound = false;
+    dealerId = null;
     dealerName = '';
     dealerShowroomAddress = '';
 
@@ -102,6 +105,15 @@ export default class BookMyDrive extends LightningElement {
     lastUserMessage = '';
     botReply = '';
     messageCounter = 0;
+    customerAcc;
+    avlVehicleList;
+
+    // ===== Coachmark state (Start Chat guidance) =====
+    isChatCoachmarkOpen = false;
+    _coachTimer;
+    _ignoreDocClickUntil = 0;
+    _docClickHandler;
+    testDriveName;
 
     get confirmImage() {
         return CONFIRM_IMG;
@@ -228,7 +240,19 @@ export default class BookMyDrive extends LightningElement {
       
         // Doorstep address is mandatory only when locationType is DOOR
         if (this.formData.locationType === 'DOOR' && this.isBlank(this.formData.address)) return true;
-      
+        this.bookingRequest = {
+                name: this.formData.name,
+                mobile: this.formData.mobile,
+                email: this.formData.email,
+                zip: this.formData.zip,
+                carModel: this.formData.carModel,
+                fuelType: this.formData.fuelType,
+                timeSlot: this.formData.datetime,
+                address: this.formData.address,
+                communication: this.formData.communication,
+                locationType: this.formData.locationType,
+                dealerId: this.dealerId
+            };
         return false;
     }
 
@@ -237,10 +261,29 @@ export default class BookMyDrive extends LightningElement {
         this.preloadCars().then(() => {
             this.startCarousel();
         });
+
+        // Close coachmark on ANY click in the page (including the embedded chat bubble click)
+        this._docClickHandler = this.handleDocClickCapture.bind(this);
+        window.addEventListener('click', this._docClickHandler, true); // capture phase
+
     }
 
     disconnectedCallback() {
         this.stopCarousel();
+        
+        if (this._poller) {
+            window.clearInterval(this._poller);
+            this._poller = null;
+        }
+
+        
+        if (this._docClickHandler) {
+            window.removeEventListener('click', this._docClickHandler, true);
+            this._docClickHandler = null;
+        }
+        window.clearTimeout(this._coachTimer);
+        this._coachTimer = null;
+
     }
 
     renderedCallback() {
@@ -327,20 +370,55 @@ export default class BookMyDrive extends LightningElement {
         this.isAiOpen = true;
     }
 
-    handleStartChat(event) {
-        this.dispatchEvent(new CustomEvent('aiclick'));
-
-        this.lastFocusedElement = event?.currentTarget;
-        this.setOriginFromElement(event?.currentTarget);
-        this.isAiOpen = true;
-
-        window.clearTimeout(this._focusTimer);
-        this._focusTimer = window.setTimeout(() => {
-            const input = this.template.querySelector('.bmd-aiInput');
-            if (input) input.focus();
-        }, 0);
-        this.initializeChat();
+    get disableStartChat() {
+        return !this.isChatReady;
     }
+
+    //OLD METHOD - handleStartChat
+    handleStartChat(event) {
+        console.log('@@ : AI Start Chat Clicked');
+    
+        // 1) Show the dim + arrow guidance
+        this.showChatCoachmark();
+    
+        // 2) ALSO attempt programmatic launch (if available) via your head markup listener
+        // (Safe: even if it fails, the coachmark still helps the user click the bubble)
+        try {
+            document.dispatchEvent(new CustomEvent('miaw:launch'));
+        } catch (e) {
+            // no-op
+        }
+    }
+
+    showChatCoachmark() {
+        // prevent the same click (Start Chat) from immediately closing it
+        this._ignoreDocClickUntil = Date.now() + 250;
+    
+        //this.isChatCoachmarkOpen = true;
+    
+        // auto-close after 5s
+        window.clearTimeout(this._coachTimer);
+        this._coachTimer = window.setTimeout(() => {
+            this.hideChatCoachmark();
+        }, 5000);
+    }
+    
+    hideChatCoachmark() {
+        this.isChatCoachmarkOpen = false;
+        window.clearTimeout(this._coachTimer);
+        this._coachTimer = null;
+    }
+    
+    handleDocClickCapture() {
+        if (!this.isChatCoachmarkOpen) return;
+    
+        // ignore the initial Start Chat click
+        if (Date.now() < this._ignoreDocClickUntil) return;
+    
+        // requirement: click anywhere should close it
+        this.hideChatCoachmark();
+    }
+    
 
     initializeChat() {
         const greeting = '👋 Hi! How can i help you today ?';
@@ -358,10 +436,6 @@ export default class BookMyDrive extends LightningElement {
 
     handleMessageChange(event) {
         this.currentMessage = event.target.value;
-    }
-
-    handleBackdropClick() {
-        if (this.isAiOpen) this.handleCloseAi();
     }
 
     handleCloseAi() {
@@ -513,11 +587,22 @@ export default class BookMyDrive extends LightningElement {
           return;
         }
       
+        // Capture date and time for datetime field
+        if (field === 'datetime') {
+          // Store the datetime-local input value in formData.datetime
+          this.formData = {
+            ...this.formData,
+            datetime: value
+          };
+          return;
+        }
+      
         // Existing behavior for remaining fields
         this.formData = {
           ...this.formData,
           [field]: value
         };
+        console.log('this.formData'+JSON.stringify(this.formData));
     }
 
     handleZipChanged(zipVal) {
@@ -555,9 +640,11 @@ export default class BookMyDrive extends LightningElement {
       
             if (res && res.found) {
                 this.dealerFound = true;
+                this.dealerId = res.dealerId;
                 this.dealerName = res.dealerName;
                 this.dealerShowroomAddress = res.showroomAddress;
                 this.showMobileStep = true;     // unlock mobile step
+                this.avlVehicleList = res.vehiclesList;
             } else {
                 this.dealerFound = false;
                 this.zipErrorMsg = (res && res.message) ? res.message : 'Sorry, we are not currently available in this zip code.';
@@ -605,6 +692,7 @@ export default class BookMyDrive extends LightningElement {
                 this.customerFound = true;
                 this.customerName = res.name;
                 this.customerEmail = res.email;
+                this.customerAcc   = res.personAccountId;
         
                 // Prefill + lock name/email (user can still edit if you want later)
                 this.formData = {
@@ -691,11 +779,30 @@ export default class BookMyDrive extends LightningElement {
     }
 
     handleSubmitForm() {
-        if (this.isSubmitDisabled) return;
+        
         console.log('Form Data:', JSON.stringify(this.formData));
 
-        //alert('Booking Request Submitted!');
-        this.isConfirmed = true;
+            console.log('Submitting booking:', JSON.stringify(this.bookingRequest));
+
+        createBooking({
+            requestMap: JSON.stringify(this.bookingRequest)
+        })
+        .then(result => {
+            console.log('Booking created successfully!'); 
+            let res = result;
+            if(res.success == false){
+                // alert('Booking failed: ' + res.message);
+                this.showGenericErrorToastMsg('Error',res.message,'error');
+                return;
+            }            
+            // Show confirmation screen
+            this.testDriveName = res.testDriveName;
+            this.isConfirmed = true;
+        })
+        .catch(error => {
+            console.error('Booking failed:', result.message);
+            alert('Booking failed: ' + result.message);
+        });
     }
 
     get backdropClass() {
@@ -753,5 +860,16 @@ export default class BookMyDrive extends LightningElement {
 
     isNonEmpty(val) {
         return val !== null && val !== undefined && String(val).trim().length > 0;
+    }
+
+    showGenericErrorToastMsg(titleType, errorMsg, variantType) {
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: titleType,
+                message: errorMsg,
+                variant: variantType,
+                mode: 'dismissable'
+            })
+        );
     }
 }
